@@ -1,0 +1,60 @@
+compilation:
+  cloud_properties:
+    cpu: 1
+    disk: 1096
+    ram: 1096
+  network: compilation-network
+  reuse_compilation_vms: true
+  workers: 1
+director_uuid: 02bc17b4-68f8-4124-afd0-3bf6acd07473
+jobs:
+- instances: 1
+  name: postgres
+  networks:
+  - name: job-network
+  persistent_disk: 2024
+  release: bosh_intro
+  resource_pool: default-pool
+  template: postgres
+name: bosh_intro_release
+networks:
+- name: job-network
+  subnets:
+  - cloud_properties:
+      name: random
+    range: 10.244.0.0/30
+  - cloud_properties:
+      name: random
+    range: 10.244.0.4/30
+  - cloud_properties:
+      name: random
+    range: 10.244.0.8/30
+  - cloud_properties:
+      name: random
+    range: 10.244.0.12/30
+- name: compilation-network
+  subnets:
+  - cloud_properties:
+      name: random
+    range: 10.244.0.16/29
+releases:
+- name: bosh_intro
+  version: latest
+resource_pools:
+- cloud_properties:
+    cpu: 1
+    disk: 1024
+    ram: 1024
+  name: default-pool
+  network: job-network
+  size: 1
+  stemcell:
+    name: bosh-warden-boshlite-ubuntu-lucid-go_agent
+    version: 60
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  max_errors: 2
+  max_in_flight: 1
+  update_watch_time: 30000-300000
+
