@@ -1,0 +1,64 @@
+#!/bin/bash -ex
+
+PACKAGE_DIR=/var/vcap/packages/postgres
+JOB_DIR=/var/vcap/jobs/postgres
+
+STORE_DIR=/var/vcap/store
+DATA_DIR=$STORE_DIR/postgres
+RUN_DIR=/var/vcap/sys/run/postgres
+
+HOST=10.244.0.2
+PORT=5432
+
+PID_FILE=$RUN_DIR/postgres.pid
+
+case "$1" in
+  start)
+
+    # setup a pid file
+    mkdir -p $RUN_DIR
+    chown vcap:vcap $RUN_DIR
+    echo $$ > $PID_FILE
+    chown vcap:vcap $PID_FILE
+
+    # if this is the first time
+    if [ ! -d $DATA_DIR -o ! -f $DATA_DIR/postgresql.conf ]; then
+      mkdir -p $DATA_DIR
+      chown vcap:vcap $DATA_DIR
+
+      echo "password" > $PACKAGE_DIR/pwfile
+
+      su - vcap -c "$PACKAGE_DIR/bin/initdb --username=postgres --pwfile=$PACKAGE_DIR/pwfile --auth=md5 -E utf8 --locale en_US.UTF-8 -D $DATA_DIR"
+
+      mkdir -p $DATA_DIR/pg_log
+      chown vcap:vcap $DATA_DIR/pg_log
+    fi
+
+    # move a custom config file into place. This config file instructs
+    # the system to use a specific pid file.
+    cp $JOB_DIR/config/postgresql.conf $DATA_DIR
+    chown vcap:vcap $DATA_DIR/postgresql.conf
+
+    echo "Starting PostgreSQL: "
+    su - vcap -c "$PACKAGE_DIR/bin/pg_ctl -o \"-h $HOST -p $PORT\" -w start -D $DATA_DIR -l \"$DATA_DIR/pg_log/startup.log\""
+
+    echo "PostgreSQL started successfully"
+
+    ;;
+  stop)
+    echo "Stopping PostgreSQL"
+    su - vcap -c "$PACKAGE_DIR/bin/pg_ctl stop -m fast -w -D $DATA_DIR"
+    echo "We should wait to make sure this dies, but we're not going to"
+    exit 0
+
+    ;;
+  status)
+    su - vcap -c "$PACKAGE_DIR/bin/pg_ctl status -D $DATA_DIR"
+
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status}"
+    exit 1
+
+    ;;
+esac
