@@ -2,5 +2,7 @@
 name: tomcat
 
 dependencies:
+- jre
 
 files:
+- tomcat/apache-tomcat-7.0.55.tar.gz
