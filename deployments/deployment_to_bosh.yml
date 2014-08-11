@@ -16,7 +16,15 @@ jobs:
   release: bosh_intro
   resource_pool: default-pool
   template: postgres
-name: bosh_intro_release
+- instances: 1
+  name: tomcat
+  networks:
+  - name: job-network
+  persistent_disk: 2024
+  release: bosh_intro
+  resource_pool: default-pool
+  template: tomcat
+name: bosh_intro_deployment
 networks:
 - name: job-network
   subnets:
