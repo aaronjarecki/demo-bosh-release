@@ -1,5 +1,7 @@
 ---
 name: tomcat
 templates:
+  tomcat_ctl.erb: bin/tomcat_ctl
 
 packages:
+- tomcat

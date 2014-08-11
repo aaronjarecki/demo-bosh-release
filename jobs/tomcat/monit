@@ -1,0 +1,5 @@
+check process catalina
+  with pidfile /var/vcap/sys/run/tomcat/catalina.pid
+  start program "/var/vcap/jobs/tomcat/bin/tomcat_ctl start" with timeout 300 seconds
+  stop program "/var/vcap/jobs/tomcat/bin/tomcat_ctl stop"
+  group vcap
