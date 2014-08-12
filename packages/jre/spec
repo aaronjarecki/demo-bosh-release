@@ -4,4 +4,4 @@ name: jre
 dependencies: []
 
 files:
-- jre/server-jre-8u11-linux-x64.gz
+- jre/server-jre-8u11-linux-x64.tar.gz

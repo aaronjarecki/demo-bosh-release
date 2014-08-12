@@ -3,7 +3,7 @@ compilation:
     cpu: 1
     disk: 1096
     ram: 1096
-  network: compilation-network
+  network: default-network
   reuse_compilation_vms: true
   workers: 1
 director_uuid: 02bc17b4-68f8-4124-afd0-3bf6acd07473
@@ -11,7 +11,9 @@ jobs:
 - instances: 1
   name: postgres
   networks:
-  - name: job-network
+  - name: default-network
+    static_ips:
+    - 10.244.0.2
   persistent_disk: 2024
   release: bosh_intro
   resource_pool: default-pool
@@ -19,32 +21,34 @@ jobs:
 - instances: 1
   name: tomcat
   networks:
-  - name: job-network
+  - name: default-network
+    static_ips:
+    - 10.244.0.6
   persistent_disk: 2024
   release: bosh_intro
   resource_pool: default-pool
   template: tomcat
 name: bosh_intro_deployment
 networks:
-- name: job-network
+- name: default-network
   subnets:
   - cloud_properties:
       name: random
     range: 10.244.0.0/30
+    reserved:
+    - 10.244.0.1
+    static:
+    - 10.244.0.2
   - cloud_properties:
       name: random
     range: 10.244.0.4/30
+    reserved:
+    - 10.244.0.5
+    static:
+    - 10.244.0.6
   - cloud_properties:
       name: random
     range: 10.244.0.8/30
-  - cloud_properties:
-      name: random
-    range: 10.244.0.12/30
-- name: compilation-network
-  subnets:
-  - cloud_properties:
-      name: random
-    range: 10.244.0.16/29
 releases:
 - name: bosh_intro
   version: latest
@@ -54,8 +58,8 @@ resource_pools:
     disk: 1024
     ram: 1024
   name: default-pool
-  network: job-network
-  size: 1
+  network: default-network
+  size: 2
   stemcell:
     name: bosh-warden-boshlite-ubuntu-lucid-go_agent
     version: 60

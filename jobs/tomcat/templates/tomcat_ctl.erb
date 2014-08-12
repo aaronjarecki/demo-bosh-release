@@ -7,23 +7,24 @@ STORE_DIR=/var/vcap/store
 DATA_DIR=$STORE_DIR/tomcat
 RUN_DIR=/var/vcap/sys/run/tomcat
 
-JAVA_HOME=/var/vcap/packages/jre
-CATALINA_HOME=$PACKAGE_DIR/something
-CATALINA_BASE=$CATALINA_HOME
+export JAVA_HOME=/var/vcap/packages/jre/jdk1.8.0_11
+CATALINA_HOME=/var/vcap/packages/tomcat/apache-tomcat-7.0.55
+export CATALINA_PID=$CATALINA_HOME/catalina.pid
 
 case "$1" in
   start)
     cd $CATALINA_HOME
     ./bin/startup.sh
+    ps -ef | grep catalina | grep -v grep | awk '{print $2}' > $CATALINA_PID
 
     #./bin/jsvc \
     #    -classpath $CATALINA_HOME/bin/bootstrap.jar:$CATALINA_HOME/bin/tomcat-juli.jar \
-    #    -outfile $CATALINA_BASE/logs/catalina.out \
-    #    -errfile $CATALINA_BASE/logs/catalina.err \
+    #    -outfile $CATALINA_HOME/logs/catalina.out \
+    #    -errfile $CATALINA_HOME/logs/catalina.err \
     #    -Dcatalina.home=$CATALINA_HOME \
-    #    -Dcatalina.base=$CATALINA_BASE \
+    #    -Dcatalina.base=$CATALINA_HOME \
     #    -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
-    #    -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
+    #    -Djava.util.logging.config.file=$CATALINA_HOME/conf/logging.properties \
     #    org.apache.catalina.startup.Bootstrap
 
     ;;

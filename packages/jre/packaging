@@ -1,4 +1,4 @@
 # abort script on any command that exits with a non zero value
 set -e
-mv jre/server-jre-8u11-linux-x64.gz ${BOSH_INSTALL_TARGET}
-gunzip ${BOSH_INSTALL_TARGET}/server-jre-8u11-linux-x64.gz
+
+tar -xzf jre/server-jre-8u11-linux-x64.tar.gz -C ${BOSH_INSTALL_TARGET}
